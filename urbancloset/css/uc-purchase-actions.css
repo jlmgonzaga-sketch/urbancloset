@@ -1,0 +1,289 @@
+/* ============================================================
+   UrbanCloset — Buy Now / Add to Cart / Make an Offer hierarchy
+   Enqueued only on single product pages (is_product()).
+   Relies on the --dark/--dark2/--gold/--tan/--cream/--muted
+   variables and --font-serif/--font-sans already declared in
+   the theme's main style.css :root.
+   ============================================================ */
+
+/* Quantity, Buy Now, and Add to Cart all live inside WooCommerce's
+   own <form class="cart">, already flexed by the theme. Reorder
+   them here rather than touching markup order. */
+.single-product .uc-purchase-actions .cart {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-items: stretch;
+}
+.single-product .uc-purchase-actions .quantity {
+  grid-column: 1;
+  justify-self: start;
+  margin-bottom: 4px;
+}
+
+/* 1. BUY NOW — highest emphasis: solid fill, first in visual order.
+   !important is used here because another stylesheet loaded after this
+   one is currently overriding these exact properties on the live site —
+   see note at the bottom of this file. */
+.single-product .uc-purchase-actions .uc-buy-now-btn {
+  grid-column: 1;
+  grid-row: 3;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background: var(--dark2) !important;
+  color: var(--gold) !important;
+  font-family: inherit !important;
+  font-size: 10px !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 28px !important;
+  border: 1px solid var(--dark2) !important;
+  border-radius: 2px;
+  text-align: center;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.single-product .uc-purchase-actions .uc-buy-now-btn:hover { opacity: 0.85; }
+.single-product .uc-purchase-actions .uc-buy-now-btn:active { transform: scale(0.98); }
+
+/* 2. ADD TO CART — secondary: outline, second in visual order.
+   Overrides the solid styling defined for .single_add_to_cart_button
+   elsewhere in the theme, scoped to the single product page only. */
+.single-product .uc-purchase-actions button.single_add_to_cart_button {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  background: transparent !important;
+  color: var(--dark2) !important;
+  border: 1px solid var(--dark2) !important;
+  font-size: 10px !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 13px 28px !important;
+  border-radius: 2px;
+  text-align: center;
+  line-height: 1.2;
+  transition: background 0.2s, color 0.2s;
+}
+.single-product .uc-purchase-actions button.single_add_to_cart_button:hover {
+  background: var(--dark2) !important;
+  color: var(--gold) !important;
+}
+.single-product .uc-purchase-actions button.single_add_to_cart_button.disabled,
+.single-product .uc-purchase-actions button.single_add_to_cart_button.disabled:hover {
+  opacity: 0.45;
+  cursor: default;
+  background: transparent !important;
+  color: var(--dark2) !important;
+}
+
+/* 3. MAKE AN OFFER — lowest emphasis: slim text CTA with arrow,
+   full width, sitting below both buttons. */
+.single-product .uc-make-offer-link {
+  display: block;
+  width: 100%;
+  order: 3;
+  box-sizing: border-box;
+  background: transparent !important;
+  border: 1px solid var(--tan) !important;
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--tan) !important;
+  text-decoration: none !important;
+  padding: 13px 2px;
+  margin-top: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.single-product .uc-make-offer-link:hover {
+  background: var(--tan) !important;
+  color: #fff !important;
+  border-color: var(--tan) !important;
+}
+
+@media (max-width: 480px) {
+  .single-product .uc-purchase-actions .quantity input { width: 58px; }
+}
+
+/* ============================================================
+   MAKE AN OFFER MODAL
+   ============================================================ */
+.uc-offer-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(21,13,5,0.55);
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.uc-offer-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.uc-offer-modal {
+  background: #fff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 6px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(12px);
+  transition: transform 0.25s;
+}
+.uc-offer-modal-overlay.open .uc-offer-modal { transform: translateY(0); }
+
+.uc-offer-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  z-index: 2;
+}
+.uc-offer-modal-close:hover { color: var(--dark2); }
+
+.uc-offer-modal-body { padding: 32px 28px 28px; }
+
+.uc-offer-eyebrow {
+  font-size: 9px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--tan);
+  margin-bottom: 8px;
+}
+.uc-offer-modal-title {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--dark2);
+  line-height: 1.2;
+  margin-bottom: 4px;
+}
+.uc-offer-modal-price {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.uc-offer-row { margin-bottom: 14px; }
+.uc-offer-row label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.uc-offer-row .uc-optional { text-transform: none; letter-spacing: 0; }
+.uc-offer-row input,
+.uc-offer-row textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid rgba(139,94,74,0.3);
+  border-radius: 2px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--dark2);
+  background: #fff;
+}
+.uc-offer-row textarea { resize: vertical; }
+
+.uc-offer-amount-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgba(139,94,74,0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.uc-offer-amount-wrap .uc-offer-currency {
+  padding: 0 0 0 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.uc-offer-amount-wrap input {
+  border: none;
+  flex: 1;
+}
+.uc-offer-amount-wrap input:focus { outline: none; }
+
+.uc-offer-error {
+  background: #fbeceb;
+  color: #a0453a;
+  font-size: 12px;
+  padding: 10px 12px;
+  border-radius: 3px;
+  margin-bottom: 14px;
+}
+
+.uc-offer-submit {
+  width: 100%;
+  background: var(--dark2);
+  color: var(--gold);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.uc-offer-submit:hover { opacity: 0.85; }
+.uc-offer-submit:disabled,
+.uc-offer-submit.is-loading { opacity: 0.6; cursor: default; }
+
+.uc-offer-disclaimer {
+  font-size: 10.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-top: 12px;
+  text-align: center;
+}
+
+.uc-offer-success {
+  text-align: center;
+  padding: 20px 0 4px;
+}
+.uc-offer-success svg { color: #5c8a5a; margin: 0 auto 14px; display: block; }
+.uc-offer-success-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--dark2);
+  margin-bottom: 8px;
+}
+.uc-offer-success-text {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 480px) {
+  .uc-offer-modal-body { padding: 26px 20px 22px; }
+}
+
+/* ============================================================
+   NOTE: several rules above use !important on background, color,
+   padding, font-size, and border for the Buy Now / Add to Cart /
+   Make an Offer controls. This is a temporary stopgap — another
+   stylesheet loaded AFTER this file (likely Customizer → Additional
+   CSS, a page builder's custom CSS panel, or a stale duplicate of
+   this file) is winning the cascade on these same properties.
+   Once that source is found and removed (inspect a button in
+   DevTools → Styles panel → look for a losing/strikethrough rule
+   and its source file), these !important flags can be deleted.
+   ============================================================ */
